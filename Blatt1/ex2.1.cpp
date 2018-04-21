@@ -3,11 +3,11 @@
 #include <fstream>
 #include <boost/format.hpp>
 
-unsigned long fib(unsigned n)
+int fib(unsigned n)
 {
-    unsigned long i = 1;
-    unsigned long j = 1;
-    unsigned long next = 0;
+    int i = 1;
+    int j = 1;
+    int next = 0;
     if (n < 1)
     {
         return 0;
@@ -55,11 +55,11 @@ int main()
         return 1;
     }
 
-    const unsigned limit = 200;
+    const unsigned limit = 300;
 
     for (unsigned i = 0; i < limit; i++)
     {
-        float_file << boost::format("%o\t%.6f\n") % i % delta<float>(i);
+        float_file << boost::format("%o\t%.15f\n") % i % delta<float>(i);
         double_file << boost::format("%o\t%.15f\n") % i % delta<double>(i);
     }
 }

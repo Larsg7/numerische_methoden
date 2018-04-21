@@ -3,7 +3,7 @@
 #include <boost/format.hpp>
 
 template <typename T>
-T phi(bool negative = false)
+T phi(bool negative = true)
 {
     return negative ? (-1 - std::sqrt(5)) / 2 : (-1 + std::sqrt(5)) / 2;
 }
