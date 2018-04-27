@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-h = 0.001
-t_max = 10
+h = 0.0001
+t_max = 5
 phi_start = 1
 l = 1
 m = 1
 g = 9.81
+
+phi_starts = [0.01, np.pi / 4, np.pi / 2, 3 * np.pi / 4]
 
 class RungeKutta_4:
     def __init__(self, f, h):
@@ -29,17 +31,33 @@ class RungeKutta_4:
         return y + 1 / 6 * (self.__k1(y, t) + 2 * self.__k2(y, t) + 2 * self.__k3(y, t) + self.__k4(y, t))
     
 
-def main():
-    def force(phi):
-        return - m * g * phi
+def get_wave_period(time, result):
+    downwards = True
+    start_time = 0
+    cross_zero = 0
+    for index, point in enumerate(result):
+        if point < 0 and downwards:
+            cross_zero += 1
+            downwards = False
+        if point > 0 and not downwards:
+            downwards = True
+        if cross_zero == 1 and start_time == 0:
+            start_time = time[index]
+        elif cross_zero == 2:
+            return time[index] - start_time
+        
 
-    def f(y, t):
-        return np.array([y[1], force(y[0])])
+def force(phi):
+        return - m * g * np.sin(phi)
 
-    def analytical(t):
-        return phi_start * np.cos(np.sqrt(g / l) * t)
+def f(y, t):
+    return np.array([y[1], force(y[0])])
 
-    y = np.array([phi_start, 0])
+def analytical(t, phi):
+    return phi * np.cos(np.sqrt(g / l) * t)
+
+def plot(phi):
+    y = np.array([phi, 0])
 
     R = RungeKutta_4(f, h)
 
@@ -51,11 +69,23 @@ def main():
         t = i * h
         time.append(t)
         result.append(y[0])
-        result_analytical.append(analytical(t))
+        a = analytical(t, phi)
+        result_analytical.append(a)
         y = R.advance_y(y, t)
 
-    plt.plot(time, result)
-    plt.plot(time, result_analytical)
+    print('Wave period numeric ({}): {}s'.format(phi, get_wave_period(time, result)))
+    print('Wave period analytical ({}): {}s'.format(phi, get_wave_period(time, result_analytical)))
+
+    p1 = plt.plot(time, result)
+    p2 = plt.plot(time, result_analytical)
+    plt.title('Phi_0 = {}'.format(phi))
+    plt.xlabel('time/s')
+    plt.ylabel('phi')
+    plt.legend((p1[0], p2[0]), ('Numeric result', 'Analytical result'))
     plt.show()
+
+def main():
+    for i in phi_starts:
+        plot(i)
 
 main()
