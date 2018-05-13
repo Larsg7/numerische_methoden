@@ -53,7 +53,7 @@ def plot(r0, v0, color='', adaptive=True, max_error=0.0001):
 
     result = sim.run(t_max, y)
     dts = sim.dts
-    plt.subplot(1, 2, 1)
+    plt.subplot(2, 2, 1)
     plt.plot(sim.ts, dts, label='Time step r0={}'.format(r0))
     plt.legend(loc='upper right')
 
@@ -63,7 +63,7 @@ def plot(r0, v0, color='', adaptive=True, max_error=0.0001):
 
     print('Min distance to aphel for r0={}: {}'.format(r0, min_distance_to_aphel))
 
-    plt.subplot(1, 2, 2)
+    plt.subplot(2, 2, 2)
     plt.plot([x[0] for x in result], [x[1] for x in result])
     plt.title('r0 = {}, v0 = {}'.format(r0, v0))
     plt.plot([0], [0], 'ro')
@@ -74,6 +74,10 @@ def plot(r0, v0, color='', adaptive=True, max_error=0.0001):
     plt.xlabel('x/a')
     plt.ylabel('y/a')
     plt.legend(loc='upper right')
+
+    plt.subplot(2, 2, 3)
+    plt.plot(sim.ts, [x[1] for x in result])
+
     return result
 
 
