@@ -55,6 +55,8 @@ def plot(r0, v0, color='', adaptive=True, max_error=0.0001):
     dts = sim.dts
     plt.subplot(2, 2, 1)
     plt.plot(sim.ts, dts, label='Time step r0={}'.format(r0))
+    plt.xlabel('t')
+    plt.ylabel('dt')
     plt.legend(loc='upper right')
 
     for r in result:
@@ -76,9 +78,12 @@ def plot(r0, v0, color='', adaptive=True, max_error=0.0001):
     plt.legend(loc='upper right')
 
     plt.subplot(2, 2, 3)
-    plt.plot(sim.ts, [x[1] for x in result])
+    plt.plot(sim.ts, [x[1] for x in result], label='y for r0={}'.format(r0))
+    plt.xlabel('t')
+    plt.ylabel('y/a')
+    plt.legend(loc='upper right')
 
-    return result
+    return (result, sim.ts)
 
 
 def verify_second_law(result):
@@ -95,6 +100,15 @@ def verify_second_law(result):
         area = functools.reduce(lambda acc, p: (
             acc[0] + area_centric_triangle(acc[1], p), p), data, (0, result[index]))[0]
         print('The area for time={} and starting time {} is: {}'.format(time, t, area))
+
+
+def calc_orbital_period(r, ts):
+    y_list = [z[1] for z in r]
+    y_start = y_list[0]
+    half_time = 0
+    for index, y in enumerate(y_list):
+        if (y < y_start):
+            return ts[index] * 2
 
 
 def main():
@@ -115,6 +129,8 @@ def main():
         result = plot(r, v, color=colors[i])
 
         # verify_second_law(result)
+        period = calc_orbital_period(result[0], result[1])
+        print(f'Orbital period for r0={r}: {period}')
         print()
     plt.title('dt={}, t_max={}'.format(h, t_max))
     plt.show()
