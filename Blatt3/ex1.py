@@ -39,7 +39,7 @@ def get_b(r0):
     return np.sqrt(a**2 - c**2)
 
 
-def plot(r0, v0, color='', adaptive=True, max_error=0.0001):
+def plot(r0, v0, color='', adaptive=True, max_error=0.00001):
     y = np.array([r0, v0])
 
     b = get_b(np.linalg.norm(r0))
