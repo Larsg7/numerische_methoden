@@ -5,7 +5,7 @@ from time import sleep
 
 
 def one_d():
-    n = 100
+    n = 30
     R = 1
     a = 2*R/(2*n+1)
     matrix_size = (2*n + 1, 2*n + 1)
@@ -20,7 +20,7 @@ def one_d():
                 A[i][j] = 1
     A = 1/a**2 * A
 
-    return CG(A, b, 0.01).run()
+    return CG(A, b, 0.00001).run()
 
 
 def two_d():
@@ -47,7 +47,6 @@ def two_d():
     return CG(A, b, 0.00000000001).run(), N
 
 
-
 class CG:
     def __init__(self, A: np.array, b: np.array, max_error):
         self.A = A
@@ -70,6 +69,7 @@ class CG:
         return (self.r.dot(self.r)) / (r_n.dot(r_n))
 
     def run(self):
+        k = 0
         while self._error() > self.max_error:
             alpha = self._alpha()
             self.x = self.x + alpha * self.p
@@ -78,7 +78,8 @@ class CG:
             beta = self._beta(r_n)
             self.p = self.r + beta * self.p
             # print(self.x, self._error())
-
+            k += 1
+        print(f'Needed {k} iterations')
         return self.x
 
 
@@ -87,12 +88,12 @@ A = np.array([[1, 2], [2, 5]])
 b = np.array([5, 12])
 
 cg = CG(A, b, 0.01)
-print(cg.run() == np.array([1, 2]))
+print(cg.run() == np.array([1., 2.]))
 print()
 
-# one_d = one_d()
-# plt.plot(np.linspace(0, 1, len(one_d)), one_d)
-# plt.show()
+one_d = one_d()
+plt.plot(np.linspace(0, 1, len(one_d)), one_d)
+plt.show()
 
 two_d, N = two_d()
 
