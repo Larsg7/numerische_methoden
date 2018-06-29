@@ -13,7 +13,7 @@ def bootstrap_K(N):
                 A[i][j] = 4.
             elif ((j - 1) % (N ** 2) == i) or ((j + 1) % (N ** 2) == i):
                 A[i][j] = -1.
-            elif ((j - (N + 1)) % (N ** 2) == i) or ((j + (N + 1)) % (N ** 2) == i):
+            elif ((j - (N)) % (N ** 2) == i) or ((j + (N)) % (N ** 2) == i):
                 A[i][j] = -1.
 
     return A
@@ -34,7 +34,7 @@ def bootstrap_K_free(N):
                 A[i][j] = a
             elif ((j - 1) == i) or ((j + 1) == i):
                 A[i][j] = -1.
-            elif ((j - (N + 1)) == i) or ((j + (N + 1)) == i):
+            elif ((j - (N)) == i) or ((j + (N)) == i):
                 A[i][j] = -1.
 
     return A
@@ -43,12 +43,31 @@ def bootstrap_K_free(N):
 # print([[4 - 2 * np.cos(2 * np.pi * i / 4) - 2 * np.cos(2 * np.pi * j / 4)
 #         for i in range(4)] for j in range(4)])
 
-def x(ws, vs, time, j):
-    return [sum(vs[mode][j] * np.cos(ws[mode] * t) for mode in range(len(ws))) for t in time]
+def initial_condition(vs, N):
+    V_ = np.linalg.inv(vs)
+    x0 = np.zeros(N * N)
+    x0[0] = 1
+    a = V_.dot(x0)
+    return a
+
+
+# def x(ws, vs, t, j, a):
+#     cycl = np.array([])
+#     for i in range(len(vs)):
+#         cycl = np.append(cycl, (vs[i][j]*np.cos(ws[i] * t) * a[i]), axis=0)
+
+#     return cycl
+
+
+def x(ws, vs, time, j, a):
+    def xt(t):
+        return np.array([vs[j][mode] * np.cos(ws[mode] * t) for mode in range(len(ws))]).dot(a)
+    return [xt(t) for t in time]
 
 
 def iv():
-    K = bootstrap_K(4)
+    N = 4
+    K = bootstrap_K(N)
     print(K)
     result = jacobi(K)
     ws = result[0]
@@ -57,13 +76,17 @@ def iv():
     print(ws)
     print()
     print(vs)
+    a = initial_condition(vs, N)
+    b = np.array([vs[i][1] for i in range(len(vs))])
+    print(b.dot(a))
     return ws, vs
 
 
 def v():
     print('Free')
-    K = bootstrap_K_free(4)
-    # print(K)
+    N = 4
+    K = bootstrap_K_free(N)
+    print(K)
     result = jacobi(K)
     ws = result[0]
     vs = result[1]
@@ -74,10 +97,13 @@ def v():
     resultBounded = iv()
     ws_ = resultBounded[0]
     vs_ = resultBounded[1]
+    a = initial_condition(vs, N)
+    a_ = initial_condition(vs_, N)
 
+    j = 15
     time = np.arange(0, 30, 0.1)
-    plt.plot(time, x(ws, vs, time, 15), label="Periodic j = 15")
-    plt.plot(time, x(ws_, vs_, time, 15), label="Free j = 15")
+    plt.plot(time, x(ws, vs, time, j, a), label="Periodic j = 15")
+    plt.plot(time, x(ws_, vs_, time, j, a_), label="Free j = 15")
 
     plt.legend()
     plt.show()
@@ -85,20 +111,24 @@ def v():
 
 def vi():
     time = np.arange(0, 30, 0.1)
-    J = [0, 6, 24, 48]
+    J = [0, 48]
     N = 7
 
     K = bootstrap_K_free(N)
+    print(K)
     result = jacobi(K)
     ws = result[0]
     vs = result[1]
 
+    a = initial_condition(vs, N)
+
     for j in J:
-        y = x(ws, vs, time, j)
+        y = x(ws, vs, time, j, a)
         plt.plot(time, y, label=f'j = {j}')
     plt.legend()
     plt.show()
 
 
-v()
+# iv()
+# v()
 vi()
