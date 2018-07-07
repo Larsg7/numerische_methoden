@@ -34,14 +34,18 @@ def to_minimize(x):
     return xi_squared(data, g(x[0], x[1], x[2]))
 
 
-def b():
+def do_minimize():
     res = minimize(to_minimize, np.array([1, 1, 1]))
     print(res.message)
     print(res.x)
     params = res.x
-    print()
+    print(f"Final x^2 / d.o.f: {to_minimize(params) / (len(data) - 4)}")
 
-    print(f"Final x^2 / d.o.f: {to_minimize(params) / (len(data) - 3)}")
+    return params
+
+
+def b():
+    params = do_minimize()
 
     plt.plot(r, V, 'o', label="Data points")
     plt.xlabel("r")
@@ -68,13 +72,14 @@ def lagrange(data, r):
 
 
 def iii():
+    params = do_minimize()
     plt.plot(r, V, 'o', label="Data points")
     plt.xlabel("r")
     plt.ylabel("V(r)")
-    plot_r = np.arange(r[0], 15, 0.01)
+    plot_r = np.arange(2, 12, 0.01)
     plt.plot(plot_r, [lagrange(data, x)
                       for x in plot_r], label="Fit (interpolated)")
-    plt.plot(plot_r, [g(0.24687979, -0.4035484, 0.04647107)(x)
+    plt.plot(plot_r, [g(params[0], params[1], params[2])(x)
                       for x in plot_r], label="Fit (chi squared)")
     plt.legend()
     plt.show()
